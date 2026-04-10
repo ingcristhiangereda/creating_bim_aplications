@@ -19,6 +19,16 @@ export const viewerToolbarTemplate: BUI.StatefullComponent<
   ViewerToolbarState
 > = (state) => {
   const { components, world } = state;
+  const predefinedColors = [
+    "#ef4444",
+    "#f97316",
+    "#eab308",
+    "#22c55e",
+    "#06b6d4",
+    "#3b82f6",
+    "#8b5cf6",
+    "#ec4899",
+  ];
 
   let colorInput: BUI.ColorInput | undefined;
 
@@ -27,13 +37,11 @@ export const viewerToolbarTemplate: BUI.StatefullComponent<
     colorInput = e as BUI.ColorInput;
   };
 
-  const onApplyColor = async ({ target: button }: { target: BUI.Button }) => {
-    if (!colorInput) return;
-    const { color } = colorInput;
+  const applySelectionColor = async (color: string, button?: BUI.Button) => {
     const highlighter = components.get(OBF.Highlighter)
     const selection = highlighter.selection.select; // this is a ModelIdMap, the engine data type to represent item selections
     if (OBC.ModelIdMapUtils.isEmpty(selection)) return;
-    button.loading = true
+    if (button) button.loading = true
     if (!highlighter.styles.has(color)) {
       highlighter.styles.set(color, {
         color: new THREE.Color(color),
@@ -50,8 +58,21 @@ export const viewerToolbarTemplate: BUI.StatefullComponent<
       false // indicates the camera to not zoom on the colorized items
     ),
       highlighter.clear("select")])
-    
-    button.loading = false
+
+    if (button) button.loading = false
+  }
+
+  const onApplyColor = async ({ target: button }: { target: BUI.Button }) => {
+    if (!colorInput) return;
+    await applySelectionColor(colorInput.color, button)
+    BUI.ContextMenu.removeMenus()
+  };
+
+  const onPaletteColorClick = async ({ target }: { target: HTMLButtonElement }) => {
+    const color = target.dataset.color
+    if (!color) return
+    if (colorInput) colorInput.color = color
+    await applySelectionColor(color)
     BUI.ContextMenu.removeMenus()
   };
 
@@ -176,9 +197,19 @@ export const viewerToolbarTemplate: BUI.StatefullComponent<
           <bim-context-menu>
             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
               <bim-color-input ${BUI.ref(onInputCreated)}></bim-color-input> <!-- custom color input from That Open Engine -->
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem;">
+                ${predefinedColors.map((color) => BUI.html`
+                  <button
+                    data-color=${color}
+                    title=${color}
+                    style="width: 1.6rem; height: 1.6rem; border-radius: 999px; border: 1px solid var(--bim-ui_bg-contrast-40); background: ${color}; cursor: pointer;"
+                    @click=${onPaletteColorClick}
+                  ></button>
+                `)}
+              </div>
               <div style="display: flex; gap: 0.5rem">
                 <bim-button @click=${onApplyColor} icon=${appIcons.APPLY} label="Apply"></bim-button>
-                <bim-button icon=${appIcons.CLEAR} label="Reset" @click=${onReset}></bim-buttom>
+                <bim-button icon=${appIcons.CLEAR} label="Reset" @click=${onReset}></bim-button>
               </div>
             </div>
           </bim-context-menu>
