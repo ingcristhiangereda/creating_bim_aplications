@@ -6,6 +6,7 @@ import { ProjectsPage } from "./react-components/ProjectsPage"
 import { ProjectDetailsPage } from "./react-components/ProjectDetailsPage"
 import { ProjectsManager } from "./classes/ProjectsManager"
 import * as BUI from "@thatopen/ui"
+import { logFirebaseAuthState } from "./firebase"
 
 BUI.Manager.init()
 
@@ -21,6 +22,8 @@ declare global {
 }
 
 const projectsManager = new ProjectsManager()
+const stopAuthLogger = logFirebaseAuthState()
+window.addEventListener("beforeunload", () => stopAuthLogger())
 
 const rootElement = document.getElementById("app") as HTMLDivElement
 const appRoot = ReactDOM.createRoot(rootElement)

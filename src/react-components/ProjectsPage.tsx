@@ -57,7 +57,7 @@ export function ProjectsPage(props: Props) {
     modal.showModal()
   }
 
-  const onFormSubmit = (e: React.FormEvent) => {
+  const onFormSubmit = async (e: React.FormEvent) => {
     const projectForm = document.getElementById("new-project-form")
     if (!(projectForm && projectForm instanceof HTMLFormElement)) {return}
     e.preventDefault()
@@ -70,8 +70,8 @@ export function ProjectsPage(props: Props) {
       finishDate: new Date(formData.get("finishDate") as string)
     }
     try {
-      Firestore.addDoc(projectsCollection, projectData)
-      const project = props.projectsManager.newProject(projectData)
+      const docRef = await Firestore.addDoc(projectsCollection, projectData)
+      props.projectsManager.newProject(projectData, docRef.id)
       projectForm.reset()
       const modal = document.getElementById("new-project-modal")
       if (!(modal && modal instanceof HTMLDialogElement)) {return}

@@ -2,10 +2,8 @@ import * as OBC from "@thatopen/components"
 
 export const setupFragmentsManager = (components: OBC.Components, world: OBC.SimpleWorld<OBC.SimpleScene, OBC.OrthoPerspectiveCamera, OBC.SimpleRenderer>) => {
   const fragments = components.get(OBC.FragmentsManager);
-  // The worker is set from the node_modules for simplicity purposes.
-  // To build the app, the worker file should be set inside the public folder
-  // at the root of the project and be referenced as "worker.mjs"
-  fragments.init("/node_modules/@thatopen/fragments/dist/Worker/worker.mjs");
+  const workerUrl = `${import.meta.env.BASE_URL}worker.mjs`
+  fragments.init(workerUrl);
 
   fragments.list.onItemSet.add(async ({ value: model }) => {
     // Clears the ItemsFinder cache, so the next time a query

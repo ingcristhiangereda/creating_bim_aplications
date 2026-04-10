@@ -1,7 +1,7 @@
 import * as BUI from "@thatopen/ui";
 import { ComponentsGrid } from "./src";
 import { viewportContainerTemplate } from "../../containers";
-import { dataSourcesPanelTemplate, itemsDataPanelTemplate, modelsPanelTemplate, queriesPanelTemplate } from "../../sections";
+import { dataSourcesPanelTemplate, itemsDataPanelTemplate, modelsPanelTemplate, queriesPanelTemplate, smartViewsPanelTemplate } from "../../sections";
 import * as OBC from "@thatopen/components"
 
 interface ComponentsGridState {
@@ -36,6 +36,10 @@ export const componentsGridTemplate: BUI.StatefullComponent<ComponentsGridState>
         template: dataSourcesPanelTemplate,
         initialState: { components }
       },
+      smartviews: {
+        template: smartViewsPanelTemplate,
+        initialState: { components }
+      },
     };
 
     grid.layouts = {
@@ -43,12 +47,14 @@ export const componentsGridTemplate: BUI.StatefullComponent<ComponentsGridState>
         template: `
           "models viewport itemsData" 1fr
           "queries viewport datasources" 1fr
+          "smartviews viewport datasources" 1fr
           /22rem 1fr 22rem
         `,
       },
       Queries: {
         template: `
           "viewport queries" 1fr
+          "viewport smartviews" 1fr
           /1fr 22rem
         `,
       },
