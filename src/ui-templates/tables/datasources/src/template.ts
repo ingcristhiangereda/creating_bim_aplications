@@ -1,5 +1,5 @@
 import * as BUI from "@thatopen/ui";
-import { DataSourcesListState } from "./types";
+import { DataSourcesListState, DataSourcesTableData } from "./types";
 import { DataEnhancer } from "../../../../bim-components/DataEnhancer";
 
 export const dataSourcesListTemplate: BUI.StatefullComponent<DataSourcesListState> = (state) => {
@@ -7,14 +7,14 @@ export const dataSourcesListTemplate: BUI.StatefullComponent<DataSourcesListStat
 
   const onCreated = (e?: Element) => {
     if (!e) return;
-    const table = e as BUI.Table;
+    const table = e as BUI.Table<DataSourcesTableData>;
     table.loadFunction = async () => {
       const data: typeof table.data = [];
       if (!source) return data
       const enhancer = components.get(DataEnhancer);
       const sourceData = await enhancer.getSourceData(source)
-      for (const entry of sourceData) {
-        data.push({data: entry})
+      for (const [entryIndex, entry] of sourceData.entries()) {
+        data.push({ data: { ...entry, __source: source, __entryIndex: entryIndex } })
       }
       return data
     }
